@@ -60,22 +60,22 @@ plt.show()
 plt.figure(2)
 
 plt.hist( btc_usd_price_kraken['Volume (Currency)'] )
-plt.xlabel('time')
-plt.ylabel( 'Volume of Bitcoin' )
+#plt.xlabel('time')
+plt.ylabel( 'Volume of Currency' )
 plt.show()
 
 plt.figure(3)
 
-plt.pie( btc_usd_price_kraken['High'] )
+plt.plot( btc_usd_price_kraken.index, btc_usd_price_kraken['High'] )
 plt.xlabel('time')
-plt.ylabel( 'Volume of Bitcoin' )
+plt.ylabel( 'High Price in USD' )
 plt.show()
 
 plt.figure(4)
 
 plt.hist( btc_usd_price_kraken['Low'] )
-plt.xlabel('time')
-plt.ylabel( 'Volume of Bitcoin' )
+#plt.xlabel('time')
+plt.ylabel( 'Low Price in USD' )
 plt.show()
 
 #break
