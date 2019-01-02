@@ -10,12 +10,13 @@ from datetime import datetime
 
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import export_graphviz
-
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix
 #break
 
-import plotly.offline as py
+'''import plotly.offline as py
 import plotly.graph_objs as go
-import plotly.figure_factory as ff
+import plotly.figure_factory as ff'''
 # py.init_notebook_mode(connected=True)
 import matplotlib.pyplot as plt
 
@@ -53,9 +54,8 @@ classes = np.zeros((btc_usd_price_kraken['Volume (Currency)'].size, 1))
 print (classes.size)
 
 for i in range (1, classes.size):
-    if ( btc_usd_price_kraken['Open'][i] - btc_usd_price_kraken['Open'][i-1] ) > Epsilon :
-        classes[i] = 2
-    elif (( btc_usd_price_kraken['Open'][i] - btc_usd_price_kraken['Open'][i-1] ) < Epsilon) and ( btc_usd_price_kraken['Open'][i] > btc_usd_price_kraken['Open'][i-1] ) :
+    
+    if ( btc_usd_price_kraken['Open'][i] > btc_usd_price_kraken['Open'][i-1] ) :
         classes[i] = 1
     else :
         classes[i] = 0
@@ -94,13 +94,17 @@ plt.show()
 
 #do classification
 
+X_train, X_test, y_train, y_test = train_test_split( btc_usd_price_kraken['Open'].values.reshape(-1,1), classes)
+
+#X - data, y - class
+
 DTC = DecisionTreeClassifier()
 
-DTC.fit(btc_usd_price_kraken['Open'].values.reshape(-1,1), classes)
+DTC.fit(X_train, y_train)
 
-score = DTC.score(btc_usd_price_kraken['Open'].values.reshape(-1,1), classes)
+score = DTC.score(X_test, y_test)
 
-predict = DTC.predict(btc_usd_price_kraken['Open'].values.reshape(-1,1))
+predict = DTC.predict(X_test)
 
 export_graphviz(DTC, out_file = "Decision_tree.dot")
 
@@ -116,11 +120,40 @@ plt.show()
 
 errors = np.zeros((1,1))
 
+'''
 for i in range (classes.size):
     if predict[i] != classes[i]:
         errors = np.append(errors, i)
         #print("predicted : ", predict[i], " but class is : ", classes[i])
+'''
 
-print(errors.size)
+#print(errors.size)
 
-print(score)
+print("score calculated from api call : " + score)
+
+true_pos, true_neg = 0,0
+false_pos, false_neg = 0,0
+
+#positive -> 1, negative -> 0
+'''
+for i in range (predict.size):
+	if predict[i] == y_test[i]:
+		if predict[i] == 0:
+			true_neg += 1
+		else:
+			true_pos += 1
+	else:
+		if predict[i] == 0:
+			false_neg'''
+
+conf_mat = confusion_matrix( y_test, predict )
+
+tn, fp, fn, tp = conf_mat.ravel()
+
+sensitivity = tp / (tp + fn)
+specificity = tn / (tn + fp)
+
+precision = tp / ( tp + fp )
+recall = sensitivity
+
+f1_score = 2 * precision * recall / ( precision + recall )
